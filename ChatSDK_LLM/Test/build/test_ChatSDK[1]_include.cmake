@@ -1,0 +1,5 @@
+if(EXISTS "/home/Voidseason/项目/ChatSDK_LLM/Test/build/test_ChatSDK[1]_tests.cmake")
+  include("/home/Voidseason/项目/ChatSDK_LLM/Test/build/test_ChatSDK[1]_tests.cmake")
+else()
+  add_test(test_ChatSDK_NOT_BUILT test_ChatSDK_NOT_BUILT)
+endif()

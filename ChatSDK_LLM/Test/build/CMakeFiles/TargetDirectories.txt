@@ -1,0 +1,3 @@
+/home/Voidseason/项目/ChatSDK_LLM/Test/build/CMakeFiles/test_ChatSDK.dir
+/home/Voidseason/项目/ChatSDK_LLM/Test/build/CMakeFiles/edit_cache.dir
+/home/Voidseason/项目/ChatSDK_LLM/Test/build/CMakeFiles/rebuild_cache.dir
