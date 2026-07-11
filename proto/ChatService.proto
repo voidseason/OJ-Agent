@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package OJ_Agent;
+
+option cc_generic_services = false;
+
+
+// ------公共消息------
+// 客户端->服务端的模型配置
+message ModelConfig
+{
+    string tag = 1;// 模型标签:openai / deepseek / other
+    string api_key = 2;// 模型api key
+    string model = 3;// 模型名称
+    string endpoint = 4;// 模型base url
+    string api_style = 5;// 模型api传输的风格:是OpenAI的response接口还是兼容接口(/v1/chat/completions)
+    string description = 6;// 模型描述
+    string proxy = 7;// 代理地址
+    string proxy_port = 8;// 代理端口
+}
+
+// 服务端->客户端的模型配置
+message ModelInfo
+{
+    string model_name = 1;
+    string description = 2;
+    string provider = 3;
+    string endpoint = 4;
+    bool is_available = 5;
+}
+// 一条客户端->服务端的模型消息
+message ModelMessage
+{
+    string role = 1;// 角色
+    string content = 2;// 内容
+    int64 timestamp = 3;// 时间戳, 单位:毫秒
+}
+
+
+//请求/响应部分
+// 空消息
+message Empty {}
+// 客户端->服务端的添加模型请求
+message AddModelRequest
+{
+    ModelConfig model_config = 1;
+}
+// 服务端->客户端的模型配置
+message AddModelResponse
+{
+    bool ok = 1; //是否添加成功
+    string error = 2;// 错误信息
+}
+// 客户端->服务端的删除模型请求
+message RemoveModelRequest
+{
+    string model_name = 1;
+}
+
+
+// ------会话管理------
+// 客户端->服务端的创建会话请求
+message CreateSessionRequest
+{
+    string model_name = 1; // 模型名称
+    string system_prompt = 2; // 系统提示（可选，用于设置Agent角色）
+    map<string,string> default_params =3; // LLM的默认参数(可选)
+}
+// 服务端->客户端返回的创建会话结果
+message CreateSessionResponse
+{
+    string session_id =1; // 生成的会话id
+}
+// 客户端->服务端的删除会话请求
+message DeleteSessionRequest
+{
+    string session_id = 1;
+}
+// 服务端->客户端返回的删除会话结果
+message DeleteSessionResponse
+{
+    bool ok =1; // 是否删除成功
+}
+// 服务端->客户端返回的会话id列表
+message ListSessionsResponse
+{
+    repeated string session_ids =1; // 会话id列表
+}
+// 客户端->服务端要求的指定会话的所有消息列表的会话id
+message GetMessagesRequest
+{
+    string session_id = 1;
+}
+// 服务端->客户端返回的指定会话的所有消息列表
+message GetMessagesResponse
+{
+    repeated ModelMessage messages =1; // 会话消息列表
+}
+// 服务端->客户端返回的模型列表
+message ListModelsResponse
+{
+    repeated ModelInfo models =1; // 模型列表
+}
+
+// ------消息操作------
+
+message SendMessageRequest
+{
+    string session_id = 1; //目标会话id
+    ModelMessage message = 2; // 要发送的消息
+    optional double temperature = 3; // 温度参数(可选)
+    optional int64 max_tokens = 4; // 最大token数(可选)
+    optional double top_p = 5; // top_p参数(可选)
+    optional int64 top_k = 6; // top_k参数(可选)
+    map<string,string> extra_params = 7; // 额外参数(可选)
+}
+// 服务端->客户端返回的发送消息结果
+message SendMessageResponse
+{
+    string reply =1; // 模型回复(空字符串=失败，错误查看grpc Status)  
+    //或者两边定义一个错误类型的协议， 用于表示错误信息
+    //然后reply如果第一个字符是错误类型的协议， 则表示错误信息
+}
+
+message StreamChunk
+{
+    string chunk =1; // 流数据
+    bool done =2; // 是否是最后一块
+}
+
+// -----服务定义------
+service ChatService {
+    // ---- 生命周期 ----
+    rpc Ping(Empty) returns (Empty);      // 心跳检测（客户端/服务端都得在）
+
+    // ---- 模型管理 ----
+    rpc AddModel(AddModelRequest)        returns (AddModelResponse);
+    rpc RemoveModel(RemoveModelRequest)  returns (Empty);
+    rpc ListModels(Empty)                returns (ListModelsResponse);
+
+    // ---- 会话管理 ----
+    rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
+    rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse);
+    rpc ListSessions(Empty)                 returns (ListSessionsResponse);
+    rpc GetMessages(GetMessagesRequest)     returns (GetMessagesResponse);
+
+    // ---- 消息操作（流式 vs 非流式） ----
+    rpc SendMessage(SendMessageRequest)    returns (SendMessageResponse);  // 一次性返回完整结果
+    rpc StreamMessage(SendMessageRequest)  returns (stream StreamChunk);  // 流式返回（实时打字机效果）
+}
