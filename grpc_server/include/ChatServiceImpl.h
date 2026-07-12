@@ -71,7 +71,9 @@ public:
                              const DeleteSessionRequest *request,
                              DeleteSessionResponse *response) override;
 
-  // 列出所有会话 ID
+  // 列出所有会话 ID（按 model_name）
+  // request 是 Empty
+  // response 里包含 ListSessionsResponse（repeated SessionInfo）
   grpc::Status ListSessions(grpc::ServerContext *context, const Empty *request,
                             ListSessionsResponse *response) override;
 
