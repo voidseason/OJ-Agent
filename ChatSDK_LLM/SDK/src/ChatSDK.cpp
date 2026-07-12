@@ -77,6 +77,11 @@ namespace ChatSDK {
     //  模型管理
     // ============================================================
 
+
+    bool Engine::IsModelAvailable(const std::string& model_name) const
+    {
+        return llm_manager_->IsModelAvailable(model_name);
+    }
     bool Engine::AddModel(const std::string& provider_name,
                           const std::map<std::string, std::string>& params)
     {
