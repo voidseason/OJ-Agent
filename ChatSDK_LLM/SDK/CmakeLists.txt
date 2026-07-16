@@ -15,23 +15,25 @@ file(GLOB_RECURSE SDK_SOURCES "C_source/*.cpp")
 file(GLOB_RECURSE SDK_HEADERS "include/*.h")
 
 #生成静态库
-add_library(${SDK_NAME} STATIC ${SDK_SOURCES} ${SDK_HEADERS})
+add_library(${SDK_NAME} STATIC ${SDK_SOURCES})
 
 #设置输出目录
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/build)
+set_target_properties(${SDK_NAME} PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/build"
+)
 
 
 #定义httplib中的CPPHTTPLIB_OPENSSL_SUPPORT
 target_compile_definitions(${SDK_NAME} PUBLIC CPPHTTPLIB_OPENSSL_SUPPORT)
 
 target_include_directories(${SDK_NAME} PUBLIC 
-${CMAKE_CURRENT_SOURCE_DIR}/include)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 #设置静态库的目录
 link_directories(/usr/local/lib)
 
 find_package(OpenSSL REQUIRED)
-include_directories(${OPENSSL_INCLUDE_DIR})
 
 #添加CPPHTTPLIB_OPENSSL_SUPPORT的定义
 target_compile_definitions(${SDK_NAME} PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)

@@ -1,2 +1,84 @@
-.*
-!.gitignore
+# ====== 构建产物 ======
+build/
+out/
+cmake-build-*/
+
+# ====== CMake 临时文件 ======
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# ====== 编译中间文件 ======
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+*.pdb
+*.ilk
+*.exp
+*.idb
+*.so.*
+*.d
+*.o.d
+
+# ====== protoc 生成的产物 ======
+*.pb.h
+*.pb.cc
+*.pb.cpp
+*.grpc.pb.h
+*.grpc.pb.cc
+*.grpc.pb.cpp
+
+# ====== 数据库（你的 SQLite） ======
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# ====== 日志 ======
+*.log
+logs/
+
+# ====== Python ======
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# ====== IDE ======
+.vscode/
+.idea/
+*.code-workspace
+.cache/
+*.swp
+*.swo
+*~
+
+# ====== 环境变量 / 密钥（千万别提交） ======
+.env
+.env.local
+*.pem
+*.key
+secrets.yaml
+config.local.yaml
+
+# ====== 临时目录 ======
+tmp/
+temp/
+.cache/
